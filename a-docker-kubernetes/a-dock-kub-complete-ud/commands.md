@@ -1,18 +1,31 @@
 ## Docker Commands Cheat Sheet
 
-1. docker run hello-world
+0. Check version
+```sh 
+docker version
+```
+1. Download image from docker hub & save locally (if doesn't exist locally) & run container
+```sh
+docker run hello-world 
+```
 
-2. docker run busybox echo hi there
-"""
-hi there
-"""
+2. Run a busybox image container
+```sh
+docker run busybox echo hi there idiot
+>> hi there idiot
+```
 
-3. docker run busybox echo bye bye
-"""
-bye bye
-"""
+3. Run a busybox image container
+```sh
+docker run busybox echo bye bye
+>> bye bye
+```
 
-4. docker container ls -a  # used -a as these conts. exit immediately, so docker ps wont show these
+4. Listing Containers
+* Using -a lists all containers, even the ones that are exited
+```sh
+docker container ls -a  
+>>
 """
 CONTAINER ID   IMAGE     COMMAND           CREATED          STATUS                      PORTS     NAMES
 7e4ce59d7a1f   busybox   "echo bye bye"    4 seconds ago    Exited (0) 3 seconds ago              nostalgic_edison
@@ -20,10 +33,16 @@ e1c85cc1ebc1   busybox   "echo hi there"   16 seconds ago   Exited (0) 15 second
 
 """
 
-## docker run syntax has the format -> docker run {imageName} {valid commands to run}
-## docker run is equal to == docker create + docker start
+docker ps # only running
 
-5. docker create hello-world 
+docker ps -a -q # q is for quiet
+```
+
+5. Only Create an Container from an Image & not run it
+* docker run syntax has the format -> docker run {imageName} {valid commands to run}
+* docker run is equal to == docker create image name + docker start container id
+```sh
+docker create hello-world 
 """
 Unable to find image 'hello-world:latest' locally
 latest: Pulling from library/hello-world
@@ -32,10 +51,18 @@ Digest: sha256:bfea6278a0a267fad2634554f4f0c6f31981eea41c553fdf5a83e95a41d40c38
 Status: Downloaded newer image for hello-world:latest
 9efa38f3610219a6cfb2c0fbba24e4514794bd1d70d19f8c8a3ca68b215e41fe
 """
+```
 
-6. docker start -a 9efa38  # initials of the cont id from prev command # -a prints the output comind out of the terminal
+6. Run an image with the container id
+```sh
+docker start -a 9efa38  # check output of prev command ; -a is for i/o
+```
 
-7. docker system prune
+
+7. Cleaning Up Stuff
+```sh
+docker system prune
+>>
 """
 WARNING! This will remove:
   - all stopped containers
@@ -44,30 +71,48 @@ WARNING! This will remove:
   - all dangling build cache
 """
 
-8. docker create busybox echo hi world
-9c847d69771ee276e4a3a764859acb159435b917e6450feeee4957f84f568204
+docker rm -f <container_id>  # cleans up the container with the ID
+docker rm -f $(docker ps -a -q) # cleans up all the containers
+```
 
-9. docker start 9c847
-9c847
+8. Check Logs
+```sh
+docker create busybox echo hi world
+>> 9c847d69771ee276e4a3a764859acb159435b917e6450feeee4957f84f568204
 
-10. docker logs 9c847 # doesn't run the container, but only shows the already gen. o/p
-hi world
+docker start 9c847
+>> 9c847
 
-### Stopping containers -> kill or stop
+docker logs 9c847
+>> hi world
 
-11. docker run busybox ping google.com
+```
 
-12. docker stop 1ed2d7433faf # waits for cleanup and then kills the process
+9. Stopping Containers
+```sh
+docker run busybox ping google.com
 
-13. docker run redis
+docker stop 1ed2d7433faf # gives time for cleanup (SIGTERM)
+docker kill 1ed2d7433faf # immediate stop (SIGKILL)
+>> 1ed2d7433faf  # this means that it stopped the running container
 
-14. redis-cli   # on other window ; gives error as can't connect. Redis is running 
-inside the container, can't access from outside
+```
+
+9. Execution Mode (Interactive)
+```sh
+docker run redis
+>> # Starts running a redis server & engages that terminal
+# Open a New Terminal
+docker ps
+>> 9542e26fc849 ( a part of the output for simplicity)
 
 ### To run commands inside the container, need to use exec
-### docker exec -it <cont id> <command> # it allows to provide i/p
-
-15. docker exec -it 9542e26fc849 redis-cli
+### docker exec -it <cont id> <command> 
+### Need to handle 3 channels -> STDIN, STDOUT, STDERR
+### -i is for attaching our terminal to the STDIN channel of the container
+### -t is for tty ; handling the formatted i/o
+docker exec -it 9542e26fc849 redis-cli 
+>>
 """
 127.0.0.1:6379
 
@@ -78,22 +123,17 @@ OK
 
 """
 
-
 ## exec can also give us shell access into our application
+docker exec -it 9542e26fc849 sh  # now we are inside the container terminal; ctrl-D for exit
 
-16. docker exec -it 9542e26fc849 sh  # now we are inside the container terminal; ctrl-D for exit
+```
 
+10. Target : Create an image that runs redis server
 
-
-### Dockerfile > Docker client > Docker Server > Usable Image
-
-### Specify base image > Run commands to install > Specify command to run on startup
-
-### Target : Create an image that runs redis server
-
-a) Create the Dockerfile (see the file itself)
-
-b) docker build .
+```sh
+Create the Dockerfile at ./a-basic-redis-server/Dockerfile
+docker build .
+>>
 """
 Sending build context to Docker daemon  2.048kB
 Step 1/3 : FROM alpine
@@ -121,7 +161,11 @@ Successfully built df462560cbd6
 
 
 """
-c) docker run df462560cbd6  # runs our custom image
+docker run df462560cbd6 # runs our custom image
+
+```
+
+
 
 ### Tagging an image
 
