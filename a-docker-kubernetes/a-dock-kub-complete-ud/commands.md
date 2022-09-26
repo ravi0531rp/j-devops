@@ -165,21 +165,40 @@ docker run df462560cbd6 # runs our custom image
 
 ```
 
+11. Tagging
+```sh
+docker build -t ravi0531rp/redis-gcc:latest .
+>> # Everything same but now the image created has a name
+
+```
 
 
-### Tagging an image
+17. Concerned with the Node App (Project B)
+Dockerfile Looks like this
+```sh
+FROM node:14-apline
 
-17. docker build -t ravi0531rp/redis-gcc:latest .
+WORKDIR /usr/app
 
-### Use COPY to copy files from filesystem to docker filesystem
+RUN npm install
+
+COPY ./ ./
+
+CMD ["npm", "start"]
+
+```
+Now run
+```sh
+docker build -t ravi0531rp/simpleweb .
+docker run -p 5000:8080 ravi0531rp/simpleweb # main system on "former" or listen on 5000, docker port on "latter" or publish/redirect on 8080  # node server
+```
 
 
-18. docker build -t ravi0531rp/simpleweb .
+20. We can override the default command by using the -it & open a shell
+```sh
+docker run -it ravi0531rp/simpleweb sh  # start a shell inside the container
 
-19. docker run -p 5000:8080 ravi0531rp/simpleweb # main system on "former" or listen on 5000, docker port on "latter" or publish/redirect on 8080  # node server
-
-
-20. docker run -it ravi0531rp/simpleweb sh  # start a shell inside the container
+```
 
 ### WORKDIR /usr/app # any following command will be executed relative to this path
 
@@ -188,6 +207,13 @@ again
 
 a) Write COPY dependencies file above, then use the RUN to install them
 b) After these 2, write one more COPY with ./ ./
+
+
+
+
+
+
+
 
 
 ### Multi container Apps

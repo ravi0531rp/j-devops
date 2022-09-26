@@ -82,3 +82,14 @@ $ sudo docker run hello-world
 * Need to specify the beahviour and everything
 * Dockerfile > Docker client > Docker Server > Usable Image
 * Specify base image > Run commands to install > Specify command to run on startup
+
+9) Contents of Dockerfile
+* Base Image -> The most basic OS equivalent that you need to start a project
+* For instance, like python base has python pre installed...
+
+10) Make a Simple Node APP and Containerize it
+* Create a Node JS APP
+* Create Dockerfile
+* Build Image from Dockerfile
+* Run Image as Container
+* Connect to Web app from a browser
