@@ -248,6 +248,8 @@ docker-compose up --build
 
 docker-compose up
 
+docker-compose up -d # -d for running in the bg
+
 docker-compose down
 ```
 
