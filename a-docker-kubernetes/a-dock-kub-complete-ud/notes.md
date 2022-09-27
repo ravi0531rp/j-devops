@@ -122,3 +122,22 @@ Using this Architecture, we can spawn any number of Containers..
 * Automates the docker run processes.
 * Just by adding container info in the docker-compose, we are telling docker-compose to make them 
   in the same network..
+
+
+13. Auto Start Containers and Error Codes
+```sh
+Status Codes                Status
+0                           Exited Properly & Everything is Okay
+1,2,3,etc                   We exited because something went wrong
+
+```
+
+* Need to add a restart Policy
+```sh
+| Restart Policies |      |Description|
+No                        Never restart
+Always                    Always restart
+On-failure                Only restart if container stops with an error code
+Unless-stopped            Always restart unless we force stop it
+
+```

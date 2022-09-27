@@ -1,9 +1,10 @@
 version: '3'
-
+#policies -> "no" , always, on-failure, unless-stopped ; notice the "no" with ""
 services:
   redis-server:
     image: 'redis'
   node-app:
+    restart : always
     build: .
     ports:
       - "5000:8081"

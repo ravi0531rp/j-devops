@@ -212,7 +212,7 @@ RUN npm install .
 
 COPY ./ ./
 
-CMD npm install
+CMD npm start
 
 
 # Build the image
@@ -253,6 +253,26 @@ docker-compose up -d # -d for running in the bg
 docker-compose down
 ```
 
+22. Restart Policy
+```
+version: '3'
+
+services:
+  redis-server:
+    image: 'redis'
+  node-app:
+    restart : always
+    build: .
+    ports:
+      - "5000:8081"
+
+```
+
+23. Status of Docker Compose Containers
+```sh
+docker-compose ps # run from the same directory as the docker-compose.yml
+
+```
 
 
 

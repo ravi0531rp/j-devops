@@ -1,5 +1,6 @@
 const express = require('express');
 const redis = require('redis');
+const process = require('process');
 
 const app = express();
 const client = redis.createClient({
@@ -8,6 +9,8 @@ const client = redis.createClient({
 client.set('visits', 0);
 
 app.get('/', (req, res) => {
+  process.exit(0); // forcefully crash our server to test auto up functionality
+  //process.exit(2); //  Use this if u want to test the on-failure policy
   client.get('visits', (err, visits) => {
     res.send('Number of visits is ' + visits);
     client.set('visits', parseInt(visits) + 1);
