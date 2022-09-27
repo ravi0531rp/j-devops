@@ -200,53 +200,59 @@ docker run -it ravi0531rp/simpleweb sh  # start a shell inside the container
 
 ```
 
-### WORKDIR /usr/app # any following command will be executed relative to this path
+21. Concerned with the Redis Node APP(Docker Compose Project)
+```
+# Make the dockerfile for the Node APP
 
-### How to handle minor source code change without building dependencies again and
-again
+FROM node:14-alpine
 
-a) Write COPY dependencies file above, then use the RUN to install them
-b) After these 2, write one more COPY with ./ ./
+COPY ./package.json ./
 
+RUN npm install .
 
+COPY ./ ./
 
-
-
-
+CMD npm install
 
 
+# Build the image
 
-### Multi container Apps
+docker build -t ravi0531rp/nodeapp .
 
-## For files, go to visits folder
+# Run a Redis server in other terminal
+docker run redis
 
-21) docker build -t ravi0531rp/visits .
+# Run a container for it
+docker run ravi0531rp/nodeapp
+```
+* Still not working, right?
+* How would these containers talk to each other?
+* Either use Docker CLI (port mappings) or use docker-compose
 
-## Need to have some networking capabilities between our node and redis containers,
-which are running independently. -> Docker compose
+```sh
+# Check out the docker-compose
+version: '3' # version of docker-compose
 
-22) See the docker-compose.yml file
-"""
-version: '3'
-services: 
+services:
   redis-server:
     image: 'redis'
   node-app:
     build: .
     ports:
-      - "4001:8081"
+      - "5000:8081"
 
-"""
+```
+* Running Docker Compose Containers
+```sh
+docker-compose up --build
 
-4001 on our system, 8081 on docker
+docker-compose up
 
-23) docker-compose up --build # --build makes sure to rebuild
+docker-compose down
+```
 
-23) docker-compose up # instead of running separately, just one command!
-### use -d for containers to run in background
 
-24) docker-compose down
 
-### How to handle if our server crashes inside the runnig containers
-### There are 4 restart policies which we can use inside docker-compose
-a) no b) always c) on-failure d) unless-stopped
+
+
+

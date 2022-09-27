@@ -93,3 +93,32 @@ $ sudo docker run hello-world
 * Build Image from Dockerfile
 * Run Image as Container
 * Connect to Web app from a browser
+
+
+11) Make a Multi Container App
+```sh
+
+| Docker Container |
+|                  |--------|
+| Node App         |        |
+                            |
+| Docker Container |        |
+|                  |--------|---------> | Docker Container     |
+| Node App         |        |           | Redis database Server|
+                            |
+| Docker Container |        |
+|                  |--------|
+| Node App         |
+
+
+Using this Architecture, we can spawn any number of Containers..
+
+
+```
+
+12) Docker Compose
+* Separate CLI that gets installed along with docker
+* Used to start up multiple containers at once
+* Automates the docker run processes.
+* Just by adding container info in the docker-compose, we are telling docker-compose to make them 
+  in the same network..
