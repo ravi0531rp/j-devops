@@ -141,3 +141,21 @@ On-failure                Only restart if container stops with an error code
 Unless-stopped            Always restart unless we force stop it
 
 ```
+
+14. Development Workflow
+```sh
+Develop <--|
+   |       |
+Testing    |
+   |       |
+Deploy ----
+```
+* Write Code -> Push to Feature Branch
+* Raise a PR -> Get it merged to master
+* Travis CI takes the code automatically -> Runs the tests
+* Deploys the APP directly to AWS Elastic Beanstalk(AZURE, GCP, etc.)
+
+* Make sure that Node JS is installed locally (for testing)
+```sh
+node -v
+```

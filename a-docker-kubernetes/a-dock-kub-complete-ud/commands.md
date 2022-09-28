@@ -274,7 +274,177 @@ docker-compose ps # run from the same directory as the docker-compose.yml
 
 ```
 
+24. Development Workflow Project
+* Create a React Dummy Project # Make sure that you are working in a fresh directory to create a git repo
+```sh
+npx create-react-app frontend # frontend is the name of the app
 
+```
+* Commands to memorize
+```sh
+npm run start # starts a development server ; for dev only
+
+npm run test # Runs tests associated with the project
+
+npm run build # Builds a production version of the app ; creates a build directory
+```
+
+* Let's work on the code
+```sh
+# Create a Dockerfile.dev in the source directory
+docker build -f Dockerfile.dev .
+
+docker run -p 3000:3000 <image_id>
+
+```
+* Delete the node_modules folder as it messes up the dependency.
+
+* What to do if we want changes to reflect immediately??
+a) Rebuild the image & Run 
+b) Figure out a clever soln ; <b>DOCKER VOLUMES</b>
+
+* Dont do straight COPY which is time-locked
+* Add a reference to the local machine folders..
+
+```sh
+
+docker run -p 3000:3000 -v /app/node_modules -v $(pwd):/app <image_id>
+                            /                   \
+  Put a bookmark for node                    Take everything from pwd & map to app folder        
+  modules folder . It says, don't look               inside the container 
+  for that folder inside the project repo.
+
+```
+
+* We can shorten the process via Docker Compose
+```sh
+# This is how the docker-compose would look like (Since we are using Dockerfile.dev for dev env)
+version : '3'
+
+services:
+  web:
+    build : 
+      context: .
+      dockerfile: Dockerfile.dev
+    ports : 
+      - "3000:3000"
+    volumes:
+      - /app/node_modules
+      - .:/app
+```
+* Executing Tests
+```sh
+# Build Normally
+docker build -f Dockerfile.dev .
+
+# Override the existing command with test
+docker run -it <cont_id> npm run test
+
+
+```
+
+* Live Updating Tests
+```sh
+# Copy & paste the test code once again in the src/App.test.js file to make changes
+# The test suite didn't rerun with 2 tests. Since we are using the snapshot method for the test container.
+# We could use a similar approach (using volumes)
+# Other way is running the container & then running the test via docker exec
+docker exec -it <cont_id> npm run test
+
+# This is not the proper way though
+# We can create a second service in the docker-compose for the test suite
+# Now the docker-compose looks like this
+version : '3'
+
+services:
+  web:
+    build : 
+      context: .
+      dockerfile: Dockerfile.dev
+    ports : 
+      - "3000:3000"
+    volumes:
+      - /app/node_modules
+      - .:/app
+
+  test:
+    build : 
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - /app/node_modules
+      - .:/app
+    command: ["npm", "run", "test"]
+
+
+
+# Now run
+docker-compose up
+# Make any change to the App.test.js ; It reflects agains
+
+```
+
+
+* Shortcomings : UI becomes messed up ; Can't use any other commands while testing..
+* Can Make use of <b>DOCKER ATTACH</b> (forwards our i/p)
+
+```sh
+# Use docker ps to get cont ids
+docker ps
+
+# docker attach <>
+
+```
+
+* What to do with prod ? Need nginx
+```sh
+    PROD ENVIRONMENT
+              |   Web Container           |
+              |                           |
+|USER| <----> | |NGINX| <---> |index.html||
+              |         <---> |main.js|   |
+              |                           |
+
+# Need a new Dockerfile (Adapted from Dockerfile.dev)
+# Build will be Multistep as we have to have nginx image as well as node-alpine in the same container..
+
+# Build Phase
+Use node:alpine
+      |
+Copy Package.json
+      |
+Install Dependencies
+      |
+Run npm run build
+
+# Run phase
+Use nginx
+    |
+Copy over the result of npm run build # Why copy other files if we already built an app (only the build dir)
+    |
+Start nginx
+```
+* Implementation
+
+```sh
+# Dockerfile looks like this
+
+FROM node:14-alpine AS builder
+WORKDIR '/app'
+COPY package.json .
+RUN npm install
+COPY . .
+RUN npm run build
+FROM nginx
+COPY --from=builder /app/build /usr/share/nginx/html
+
+
+# Build and Run
+docker build .
+
+docker run -p 8080:80 <image_id>
+
+```
 
 
 
