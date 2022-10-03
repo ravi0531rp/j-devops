@@ -446,5 +446,7 @@ docker run -p 8080:80 <image_id>
 
 ```
 
-
-
+25. CI CD Phase
+* Create a Git Repo
+* Set up Remote Github repo.
+* We'll be using the Github Actions tool instead of Travis CI as it is free.
